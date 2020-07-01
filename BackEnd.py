@@ -32,6 +32,7 @@ input_shape = (28, 28, 1)
 x_train = x_train.astype("float32") / 255
 x_test = x_test.astype("float32") / 255
 
+#reshape data for compatibility with CNN
 x_train=np.reshape(x_train, (60000,28,28,1))
 x_test=np.reshape(x_test, (10000,28,28,1))
 
