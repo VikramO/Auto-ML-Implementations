@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist, imdb
-from tensorflow.python.keras.utils.data_utils import Sequence
 import autokeras as ak
 from sklearn.datasets import fetch_california_housing
 
