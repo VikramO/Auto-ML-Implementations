@@ -11,6 +11,8 @@ import tensorflow as tf
 from tensorflow.keras.datasets import mnist, imdb
 import autokeras as ak
 from sklearn.datasets import fetch_california_housing
+import os
+
 
 class ImageClassification():
     def train():
@@ -292,3 +294,49 @@ class StructuredRegression():
         # Evaluate the best model with testing data.
         print(reg.evaluate(test_file_path, 'Price'))
     
+class VanillaLSTM():
+    def train(): 
+        zip_path = keras.utils.get_file(
+        origin='https://storage.googleapis.com/tensorflow/tf-keras-datasets/jena_climate_2009_2016.csv.zip',
+        fname='jena_climate_2009_2016.csv.zip',
+        extract=True)
+        csv_path, _ = os.path.splitext(zip_path)
+        df = pd.read_csv(csv_path)
+        df=df.drop(columns=['Date Time'])
+        df.iloc[:] = df.iloc[::-1].values
+        
+        #User has to specify feature columns, I chose columns 3 through 7
+        X=df.iloc[:, 2:7]
+        X=np.array(X)
+        
+        #Similarly the user has to choose output column, I chose the 2nd one since it's the Temperature(°C)
+        y=df.iloc[:,[1]]
+        y=np.array(y)
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
+        X_train = np.reshape(X_train, (X_train.shape[0], 1, X_train.shape[1]))
+        X_test = np.reshape(X_test, (X_test.shape[0], 1, X_test.shape[1]))
+        y_train=y_train.reshape(-1, 1)
+        y_test=y_test.reshape(-1, 1)
+
+        print(X_train.shape)
+        print(y_train.shape)
+        print(X_test.shape)
+        print(y_test.shape)
+
+        model = keras.Sequential()
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(Dense(64, activation='relu'))
+        model.add(Flatten())
+        model.add(Dense(1, activation='linear'))
+
+        model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+        model.fit(X_train, y_train, batch_size=256, epochs=15, validation_data=(X_test, y_test))
+        print(model.evaluate(X_test, y_test))
