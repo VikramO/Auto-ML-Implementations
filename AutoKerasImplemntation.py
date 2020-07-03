@@ -305,8 +305,8 @@ class VanillaLSTM():
         df=df.drop(columns=['Date Time'])
         df.iloc[:] = df.iloc[::-1].values
         
-        #User has to specify feature columns, I chose columns 3 through 7
-        X=df.iloc[:, 2:7]
+        #User has to specify feature columns, I chose columns 4 through 7
+        X=df.iloc[:, 3:7]
         X=np.array(X)
         
         #Similarly the user has to choose output column, I chose the 2nd one since it's the Temperature(°C)
