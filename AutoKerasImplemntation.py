@@ -1,6 +1,6 @@
 """
 Created on Wed Jul 01 2020
-Updated on Wed Jul 01 2020
+Updated on Wed Jul 04 2020
 
 Initial implementation of autokeras for model optimization
 """
@@ -380,5 +380,5 @@ class AutoARIMA():
         
         error = smape(y_test, forecasts)
         mae = mean_absolute_error(y_test, forecasts)
-        print("Symmetric Absolute Percentage Error:", error)
-        print("Mean Absolute Error:", mae)
+        print("Symmetric Absolute Percentage Error: ", error)
+        print("Mean Absolute Error: ", mae)
