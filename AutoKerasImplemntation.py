@@ -12,6 +12,11 @@ from tensorflow.keras.datasets import mnist, imdb
 import autokeras as ak
 from sklearn.datasets import fetch_california_housing
 import os
+import pmdarima as pm
+from pmdarima.model_selection import train_test_split
+from pmdarima.preprocessing import BoxCoxEndogTransformer
+from pmdarima.metrics import smape
+from sklearn.preprocessing import power_transform
 
 
 class ImageClassification():
@@ -341,3 +346,39 @@ class VanillaLSTM():
         model.compile(optimizer='adam', loss='mse', metrics=['mae'])
         model.fit(X_train, y_train, batch_size=256, epochs=15, validation_data=(X_test, y_test))
         print(model.evaluate(X_test, y_test))
+
+class AutoARIMA():
+    def train(self):
+        #Get a dataset. This is Microsoft stock data.
+        df = pm.datasets.load_msft()
+        df = df.drop(columns=['Date', 'Volume', 'OpenInt'])
+        df.iloc[:] = df.iloc[::-1].values
+        
+        #Dataset shape is now (7983,4)
+        print(df.shape)
+        
+        #define the series to be forecasted (user specified)
+        y = df['High']
+        y = np.array(y)
+        y = y.reshape(-1,1)
+        
+        
+        #exog represents the exogeneous variables (user specified)
+        exog = df[['Open','Low','Close']]
+        exog = np.array(exog)
+        
+        #Box-Cox transform on y and exog
+        y = power_transform(y, method='box-cox')
+        exog = power_transform(exog, method='box-cox')
+        
+        y_train, y_test = train_test_split(y, test_size=0.2)
+        exog_train, exog_test = train_test_split(exog, test_size=0.2)
+        
+        arima = pm.auto_arima(y_train, exog_train, start_p=1, d=None, start_q=1, information_criterion='aic', 
+                                   maxiter=100, method='lbfgs', test='kpss', stepwise=True)
+        
+ 
+        forecasts = arima.predict(y_test.shape[0], exog_test)
+        
+        error = smape(y_test, forecasts)
+        print(error)
