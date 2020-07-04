@@ -362,7 +362,6 @@ class AutoARIMA():
         y = np.array(y)
         y = y.reshape(-1,1)
         
-        
         #exog represents the exogeneous variables (user specified)
         exog = df[['Open','Low','Close']]
         exog = np.array(exog)
