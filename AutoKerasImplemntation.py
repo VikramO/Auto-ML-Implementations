@@ -296,6 +296,7 @@ class StructuredRegression():
     
 class VanillaLSTM():
     def train(): 
+        #Get a dataset
         zip_path = keras.utils.get_file(
         origin='https://storage.googleapis.com/tensorflow/tf-keras-datasets/jena_climate_2009_2016.csv.zip',
         fname='jena_climate_2009_2016.csv.zip',
