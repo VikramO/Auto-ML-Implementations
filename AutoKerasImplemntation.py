@@ -310,7 +310,6 @@ class VanillaLSTM():
         csv_path, _ = os.path.splitext(zip_path)
         df = pd.read_csv(csv_path)
         df=df.drop(columns=['Date Time'])
-        df.iloc[:] = df.iloc[::-1].values
         
         #User has to specify feature columns, I chose columns 4 through 7
         X=df.iloc[:, 3:7]
@@ -353,7 +352,6 @@ class AutoARIMA():
         #Get a dataset. This is Microsoft stock data.
         df = pm.datasets.load_msft()
         df = df.drop(columns=['Date', 'Volume', 'OpenInt'])
-        df.iloc[:] = df.iloc[::-1].values
         
         #Dataset shape is now (7983,4)
         print(df.shape)
