@@ -17,6 +17,7 @@ from pmdarima.model_selection import train_test_split
 from pmdarima.preprocessing import BoxCoxEndogTransformer
 from pmdarima.metrics import smape
 from sklearn.preprocessing import power_transform
+from sklearn.metrics import mean_absolute_error
 
 
 class ImageClassification():
@@ -380,4 +381,6 @@ class AutoARIMA():
         forecasts = arima.predict(y_test.shape[0], exog_test)
         
         error = smape(y_test, forecasts)
-        print(error)
+        mae = mean_absolute_error(y_test, forecasts)
+        print("Symmetric Absolute Percentage Error:", error)
+        print("Mean Absolute Error:", mae)
