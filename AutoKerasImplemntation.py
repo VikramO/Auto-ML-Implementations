@@ -1,6 +1,6 @@
 """
 Created on Wed Jul 01 2020
-Updated on Wed Jul 01 2020
+Updated on Wed Jul 04 2020
 
 Initial implementation of autokeras for model optimization
 """
@@ -11,6 +11,14 @@ import tensorflow as tf
 from tensorflow.keras.datasets import mnist, imdb
 import autokeras as ak
 from sklearn.datasets import fetch_california_housing
+import os
+import pmdarima as pm
+from pmdarima.model_selection import train_test_split
+from pmdarima.preprocessing import BoxCoxEndogTransformer
+from pmdarima.metrics import smape
+from sklearn.preprocessing import power_transform
+from sklearn.metrics import mean_absolute_error
+
 
 class ImageClassification():
     def train():
@@ -292,4 +300,85 @@ class StructuredRegression():
         # Evaluate the best model with testing data.
         print(reg.evaluate(test_file_path, 'Price'))
     
-ImageRegression.train()
+class VanillaLSTM():
+    def train(): 
+        #Get a dataset
+        zip_path = keras.utils.get_file(
+        origin='https://storage.googleapis.com/tensorflow/tf-keras-datasets/jena_climate_2009_2016.csv.zip',
+        fname='jena_climate_2009_2016.csv.zip',
+        extract=True)
+        csv_path, _ = os.path.splitext(zip_path)
+        df = pd.read_csv(csv_path)
+        df=df.drop(columns=['Date Time'])
+        
+        #User has to specify feature columns, I chose columns 4 through 7
+        X=df.iloc[:, 3:7]
+        X=np.array(X)
+        
+        #Similarly the user has to choose output column, I chose the 2nd one since it's the Temperature(°C)
+        y=df.iloc[:,[1]]
+        y=np.array(y)
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
+        X_train = np.reshape(X_train, (X_train.shape[0], 1, X_train.shape[1]))
+        X_test = np.reshape(X_test, (X_test.shape[0], 1, X_test.shape[1]))
+        y_train=y_train.reshape(-1, 1)
+        y_test=y_test.reshape(-1, 1)
+
+        print(X_train.shape)
+        print(y_train.shape)
+        print(X_test.shape)
+        print(y_test.shape)
+
+        model = keras.Sequential()
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(LSTM(64, activation='tanh', return_sequences=True))
+        model.add(LSTM(32, activation='tanh', return_sequences=True))
+        model.add(Dense(64, activation='relu'))
+        model.add(Flatten())
+        model.add(Dense(1, activation='linear'))
+
+        model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+        model.fit(X_train, y_train, batch_size=256, epochs=15, validation_data=(X_test, y_test))
+        print(model.evaluate(X_test, y_test))
+
+class AutoARIMA():
+    def train(self):
+        #Get a dataset. This is Microsoft stock data.
+        df = pm.datasets.load_msft()
+        df = df.drop(columns=['Date', 'Volume', 'OpenInt'])
+        
+        #Dataset shape is now (7983,4)
+        print(df.shape)
+        
+        #define the series to be forecasted (user specified)
+        y = df['High']
+        y = np.array(y)
+        y = y.reshape(-1,1)
+        
+        #exog represents the exogeneous variables (user specified)
+        exog = df[['Open','Low','Close']]
+        exog = np.array(exog)
+        
+        #Box-Cox transform on y and exog
+        y = power_transform(y, method='box-cox')
+        exog = power_transform(exog, method='box-cox')
+        
+        y_train, y_test = train_test_split(y, test_size=0.2)
+        exog_train, exog_test = train_test_split(exog, test_size=0.2)
+        
+        arima = pm.auto_arima(y_train, exog_train, start_p=1, d=None, start_q=1, information_criterion='aic', 
+                                   maxiter=100, method='lbfgs', test='kpss', stepwise=True)
+        
+ 
+        forecasts = arima.predict(y_test.shape[0], exog_test)
+        
+        error = smape(y_test, forecasts)
+        mae = mean_absolute_error(y_test, forecasts)
+        print("Symmetric Mean Absolute Percentage Error: ", error)
+        print("Mean Absolute Error: ", mae)
