@@ -8,6 +8,7 @@ Initial implementation of autokeras for model optimization
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import keras
 from tensorflow.keras.datasets import mnist, imdb
 import autokeras as ak
 from sklearn.datasets import fetch_california_housing
@@ -382,3 +383,5 @@ class AutoARIMA():
         mae = mean_absolute_error(y_test, forecasts)
         print("Symmetric Mean Absolute Percentage Error: ", error)
         print("Mean Absolute Error: ", mae)
+
+VanillaLSTM.train()
