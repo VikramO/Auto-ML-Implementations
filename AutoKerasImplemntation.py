@@ -23,7 +23,6 @@ from sklearn.datasets import fetch_california_housing
 import os
 import pmdarima as pm
 from pmdarima.model_selection import train_test_split
-from pmdarima.preprocessing import BoxCoxEndogTransformer
 from pmdarima.metrics import smape
 from sklearn.preprocessing import power_transform
 from sklearn.metrics import mean_absolute_error
