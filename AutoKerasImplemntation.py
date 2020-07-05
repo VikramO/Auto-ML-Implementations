@@ -8,14 +8,21 @@ Initial implementation of autokeras for model optimization
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-import keras
+from tensorflow import keras
 from tensorflow.keras.datasets import mnist, imdb
 import autokeras as ak
+from tensorflow.keras import regularizers
+from tensorflow.keras.layers import Dense, Dropout, LSTM, Flatten
+from tensorflow.keras.constraints import max_norm
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_california_housing
 import os
 import pmdarima as pm
 from pmdarima.model_selection import train_test_split
-from pmdarima.preprocessing import BoxCoxEndogTransformer
 from pmdarima.metrics import smape
 from sklearn.preprocessing import power_transform
 from sklearn.metrics import mean_absolute_error
@@ -383,5 +390,3 @@ class AutoARIMA():
         mae = mean_absolute_error(y_test, forecasts)
         print("Symmetric Mean Absolute Percentage Error: ", error)
         print("Mean Absolute Error: ", mae)
-
-VanillaLSTM.train()
