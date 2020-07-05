@@ -5,27 +5,26 @@ Updated on Wed Jul 04 2020
 Initial implementation of autokeras for model optimization
 """
 
+import os
 import numpy as np
 import pandas as pd
+import autokeras as ak
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.datasets import mnist, imdb
-import autokeras as ak
 from tensorflow.keras import regularizers
 from tensorflow.keras.layers import Dense, Dropout, LSTM, Flatten
 from tensorflow.keras.constraints import max_norm
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Layer
+import sklearn
 from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import fetch_california_housing
-import os
-import pmdarima as pm
-from pmdarima.model_selection import train_test_split
-from pmdarima.metrics import smape
 from sklearn.preprocessing import power_transform
 from sklearn.metrics import mean_absolute_error
+from sklearn.datasets import fetch_california_housing
+import pmdarima as pm
+from pmdarima.metrics import smape
 
 
 class ImageClassification():
@@ -327,7 +326,7 @@ class VanillaLSTM():
         y=df.iloc[:,[1]]
         y=np.array(y)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=3)
+        X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(X, y, test_size=0.2, random_state=3)
         X_train = np.reshape(X_train, (X_train.shape[0], 1, X_train.shape[1]))
         X_test = np.reshape(X_test, (X_test.shape[0], 1, X_test.shape[1]))
         y_train=y_train.reshape(-1, 1)
@@ -377,8 +376,8 @@ class AutoARIMA():
         y = power_transform(y, method='box-cox')
         exog = power_transform(exog, method='box-cox')
         
-        y_train, y_test = train_test_split(y, test_size=0.2)
-        exog_train, exog_test = train_test_split(exog, test_size=0.2)
+        y_train, y_test = pm.model_selection.train_test_split(y, test_size=0.2)
+        exog_train, exog_test = pm.model_selection.train_test_split(exog, test_size=0.2)
         
         arima = pm.auto_arima(y_train, exog_train, start_p=1, d=None, start_q=1, information_criterion='aic', 
                                    maxiter=100, method='lbfgs', test='kpss', stepwise=True)
@@ -390,3 +389,6 @@ class AutoARIMA():
         mae = mean_absolute_error(y_test, forecasts)
         print("Symmetric Mean Absolute Percentage Error: ", error)
         print("Mean Absolute Error: ", mae)
+
+
+VanillaLSTM.train()
