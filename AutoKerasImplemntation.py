@@ -8,8 +8,17 @@ Initial implementation of autokeras for model optimization
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras.datasets import mnist, imdb
 import autokeras as ak
+from tensorflow.keras import regularizers
+from tensorflow.keras.layers import Dense, Dropout, LSTM, Flatten
+from tensorflow.keras.constraints import max_norm
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Layer
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 from sklearn.datasets import fetch_california_housing
 import os
 import pmdarima as pm
