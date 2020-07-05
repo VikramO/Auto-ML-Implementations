@@ -11,10 +11,36 @@ will be used for current development phase.
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.python.util import nest
 import cython
 import pandas as pd
 import numpy as np
 
+from autokeras import blocks
+from autokeras import graph as graph_module
+from autokeras import nodes as input_module
+from autokeras import tuners
+from autokeras.engine import head as head_module
+from autokeras.engine import node as node_module
+from autokeras.engine import preprocessor
+from autokeras.engine import tuner
+from autokeras.nodes import Input
+from autokeras.utils import data_utils
+
+TUNER_CLASSES = {
+    'bayesian': tuners.BayesianOptimization,
+    'random': tuners.RandomSearch,
+    'hyperband': tuners.Hyperband,
+    'greedy': tuners.Greedy,
+}
+
+def get_tuner_class(tuner):
+    if isinstance(tuner, str) and tuner in TUNER_CLASSES:
+        return TUNER_CLASSES.get(tuner)
+    else:
+        raise ValueError('The value {tuner} passed for argument tuner is invalid, '
+                         'expected one of "greedy", "random", "hyperband", '
+                         '"bayesian".'.format(tuner=tuner))
 
 #write generalized code for dataset generation above
 #assuming dataset is already defined as 'df'

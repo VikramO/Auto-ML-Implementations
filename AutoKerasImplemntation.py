@@ -292,3 +292,4 @@ class StructuredRegression():
         # Evaluate the best model with testing data.
         print(reg.evaluate(test_file_path, 'Price'))
     
+ImageRegression.train()
