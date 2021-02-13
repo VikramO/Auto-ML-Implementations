@@ -1,2 +1,1 @@
-# Accessible-ML
-Code and implementations and whatnot
+Implementations of various open-source AutoML solutions
